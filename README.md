@@ -59,10 +59,13 @@ The application will:
 
 ## Default credentials (seeded automatically)
 
-| Role  | Email                 | Password  | Locations |
-|-------|-----------------------|-----------|-----------|
-| admin | admin@example.com     | admin123  | all       |
-| user  | jakarta@example.com   | user123   | Jakarta   |
+| Role  | Email                    | Password  | Locations           |
+|-------|--------------------------|-----------|---------------------|
+| admin | admin@example.com        | admin123  | all                 |
+| user  | jakarta@example.com      | user123   | Jakarta             |
+| user  | surabaya@example.com     | user123   | Surabaya            |
+| user  | bandung@example.com      | user123   | Bandung             |
+| user  | supervisor@example.com   | super123  | Jakarta + Surabaya  |
 
 ## Generate Swagger docs
 

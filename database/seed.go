@@ -15,9 +15,9 @@ const (
 	bandungUID   = "dddddddd-dddd-dddd-dddd-dddddddddddd"
 	supervisorID = "eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"
 
-	jakartaLocID  = "11111111-1111-1111-1111-111111111111"
-	surabayaLocID = "22222222-2222-2222-2222-222222222222"
-	bandungLocID  = "33333333-3333-3333-3333-333333333333"
+	jakartaLocID  int64 = 1
+	surabayaLocID int64 = 2
+	bandungLocID  int64 = 3
 )
 
 type seedUser struct {
@@ -27,7 +27,7 @@ type seedUser struct {
 	password string
 	role     string
 	// locations the user can access (ignored for admin)
-	locations []string
+	locations []int64
 }
 
 // SeedUsers inserts the default demo users on first run. Idempotent.
@@ -49,7 +49,7 @@ func SeedUsers(pool *pgxpool.Pool) error {
 			email:     "jakarta@example.com",
 			password:  "user123",
 			role:      "user",
-			locations: []string{jakartaLocID},
+			locations: []int64{jakartaLocID},
 		},
 		{
 			id:        surabayaUID,
@@ -57,7 +57,7 @@ func SeedUsers(pool *pgxpool.Pool) error {
 			email:     "surabaya@example.com",
 			password:  "user123",
 			role:      "user",
-			locations: []string{surabayaLocID},
+			locations: []int64{surabayaLocID},
 		},
 		{
 			id:        bandungUID,
@@ -65,7 +65,7 @@ func SeedUsers(pool *pgxpool.Pool) error {
 			email:     "bandung@example.com",
 			password:  "user123",
 			role:      "user",
-			locations: []string{bandungLocID},
+			locations: []int64{bandungLocID},
 		},
 		{
 			id:        supervisorID,
@@ -73,7 +73,7 @@ func SeedUsers(pool *pgxpool.Pool) error {
 			email:     "supervisor@example.com",
 			password:  "super123",
 			role:      "user",
-			locations: []string{jakartaLocID, surabayaLocID},
+			locations: []int64{jakartaLocID, surabayaLocID},
 		},
 	}
 

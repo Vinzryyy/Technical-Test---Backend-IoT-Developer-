@@ -46,9 +46,9 @@ type RegisterRequest struct {
 // StaffRegisterRequest is used by admins to create new staff with an
 // explicit role and location access list.
 type StaffRegisterRequest struct {
-	Name        string   `json:"name"         validate:"required,min=2,max=100"`
-	Email       string   `json:"email"        validate:"required,email"`
-	Password    string   `json:"password"     validate:"required,min=6"`
-	Role        string   `json:"role"         validate:"omitempty,oneof=admin user"`
-	LocationIDs []string `json:"location_ids" validate:"omitempty,dive,uuid"`
+	Name        string  `json:"name"         validate:"required,min=2,max=100"`
+	Email       string  `json:"email"        validate:"required,email"`
+	Password    string  `json:"password"     validate:"required,min=6"`
+	Role        string  `json:"role"         validate:"omitempty,oneof=admin user"`
+	LocationIDs []int64 `json:"location_ids" validate:"omitempty,dive,gt=0"`
 }

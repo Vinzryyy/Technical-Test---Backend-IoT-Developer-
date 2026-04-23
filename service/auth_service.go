@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/vinzryyy/iot-backend/models"
@@ -78,7 +79,7 @@ func (s *AuthService) RegisterStaff(ctx context.Context, req models.StaffRegiste
 	return s.createUser(ctx, req.Name, req.Email, req.Password, role, req.LocationIDs)
 }
 
-func (s *AuthService) createUser(ctx context.Context, name, email, password, role string, locationIDs []string) (*models.User, error) {
+func (s *AuthService) createUser(ctx context.Context, name, email, password, role string, locationIDs []int64) (*models.User, error) {
 	if existing, err := s.users.FindByEmail(ctx, email); err == nil && existing != nil {
 		return nil, ErrEmailExists
 	} else if err != nil && !errors.Is(err, repo.ErrNotFound) {
@@ -91,7 +92,7 @@ func (s *AuthService) createUser(ctx context.Context, name, email, password, rol
 			return nil, err
 		}
 		if !ok {
-			return nil, errors.New("unknown location id: " + lid)
+			return nil, fmt.Errorf("unknown location id: %d", lid)
 		}
 	}
 

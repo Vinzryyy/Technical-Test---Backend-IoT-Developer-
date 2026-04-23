@@ -2,6 +2,7 @@ package app
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 	"github.com/vinzryyy/iot-backend/models"
@@ -20,6 +21,14 @@ func (h *DeviceHandler) actor(c echo.Context) (userID, role string) {
 	userID, _ = c.Get(CtxUserID).(string)
 	role, _ = c.Get(CtxRole).(string)
 	return
+}
+
+func parseIntID(c echo.Context) (int64, error) {
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil || id <= 0 {
+		return 0, echo.NewHTTPError(http.StatusBadRequest, "id must be a positive integer")
+	}
+	return id, nil
 }
 
 // List godoc
@@ -44,14 +53,18 @@ func (h *DeviceHandler) List(c echo.Context) error {
 // @Tags         devices
 // @Produce      json
 // @Security     BearerAuth
-// @Param        id path string true "Device ID"
+// @Param        id path int true "Device ID"
 // @Success      200 {object} models.APIResponse{data=models.Device}
 // @Failure      403 {object} models.APIResponse
 // @Failure      404 {object} models.APIResponse
 // @Router       /devices/{id} [get]
 func (h *DeviceHandler) Get(c echo.Context) error {
+	id, err := parseIntID(c)
+	if err != nil {
+		return err
+	}
 	uid, role := h.actor(c)
-	d, err := h.devices.Get(c.Request().Context(), uid, role, c.Param("id"))
+	d, err := h.devices.Get(c.Request().Context(), uid, role, id)
 	if err != nil {
 		return err
 	}
@@ -93,11 +106,15 @@ func (h *DeviceHandler) Create(c echo.Context) error {
 // @Accept       json
 // @Produce      json
 // @Security     BearerAuth
-// @Param        id path string true "Device ID"
+// @Param        id path int true "Device ID"
 // @Param        request body models.UpdateDeviceRequest true "device"
 // @Success      200 {object} models.APIResponse{data=models.Device}
 // @Router       /devices/{id} [put]
 func (h *DeviceHandler) Update(c echo.Context) error {
+	id, err := parseIntID(c)
+	if err != nil {
+		return err
+	}
 	var req models.UpdateDeviceRequest
 	if err := c.Bind(&req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body")
@@ -106,7 +123,7 @@ func (h *DeviceHandler) Update(c echo.Context) error {
 		return err
 	}
 	uid, role := h.actor(c)
-	d, err := h.devices.Update(c.Request().Context(), uid, role, c.Param("id"), req)
+	d, err := h.devices.Update(c.Request().Context(), uid, role, id, req)
 	if err != nil {
 		return err
 	}
@@ -119,12 +136,16 @@ func (h *DeviceHandler) Update(c echo.Context) error {
 // @Summary      Delete device
 // @Tags         devices
 // @Security     BearerAuth
-// @Param        id path string true "Device ID"
+// @Param        id path int true "Device ID"
 // @Success      200 {object} models.APIResponse
 // @Router       /devices/{id} [delete]
 func (h *DeviceHandler) Delete(c echo.Context) error {
+	id, err := parseIntID(c)
+	if err != nil {
+		return err
+	}
 	uid, role := h.actor(c)
-	if err := h.devices.Delete(c.Request().Context(), uid, role, c.Param("id")); err != nil {
+	if err := h.devices.Delete(c.Request().Context(), uid, role, id); err != nil {
 		return err
 	}
 	return c.JSON(http.StatusOK, models.APIResponse{

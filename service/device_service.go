@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/google/uuid"
 	"github.com/vinzryyy/iot-backend/models"
 	"github.com/vinzryyy/iot-backend/repo"
 )
@@ -21,12 +20,12 @@ func NewDeviceService(d *repo.DeviceRepository, u *repo.UserRepository, l *repo.
 	return &DeviceService{devices: d, users: u, locations: l}
 }
 
-func (s *DeviceService) allowedLocations(ctx context.Context, userID, role string) ([]string, map[string]struct{}, error) {
+func (s *DeviceService) allowedLocations(ctx context.Context, userID, role string) ([]int64, map[int64]struct{}, error) {
 	ids, err := s.users.LocationIDs(ctx, userID, role)
 	if err != nil {
 		return nil, nil, err
 	}
-	set := make(map[string]struct{}, len(ids))
+	set := make(map[int64]struct{}, len(ids))
 	for _, id := range ids {
 		set[id] = struct{}{}
 	}
@@ -41,7 +40,7 @@ func (s *DeviceService) List(ctx context.Context, userID, role string) ([]models
 	return s.devices.List(ctx, ids)
 }
 
-func (s *DeviceService) Get(ctx context.Context, userID, role, id string) (*models.Device, error) {
+func (s *DeviceService) Get(ctx context.Context, userID, role string, id int64) (*models.Device, error) {
 	_, allowed, err := s.allowedLocations(ctx, userID, role)
 	if err != nil {
 		return nil, err
@@ -79,7 +78,6 @@ func (s *DeviceService) Create(ctx context.Context, userID, role string, req mod
 	}
 
 	d := &models.Device{
-		ID:         uuid.NewString(),
 		Name:       req.Name,
 		LocationID: req.LocationID,
 		Status:     status,
@@ -90,7 +88,7 @@ func (s *DeviceService) Create(ctx context.Context, userID, role string, req mod
 	return s.devices.FindByID(ctx, d.ID)
 }
 
-func (s *DeviceService) Update(ctx context.Context, userID, role, id string, req models.UpdateDeviceRequest) (*models.Device, error) {
+func (s *DeviceService) Update(ctx context.Context, userID, role string, id int64, req models.UpdateDeviceRequest) (*models.Device, error) {
 	_, allowed, err := s.allowedLocations(ctx, userID, role)
 	if err != nil {
 		return nil, err
@@ -106,7 +104,7 @@ func (s *DeviceService) Update(ctx context.Context, userID, role, id string, req
 	if req.Name != "" {
 		existing.Name = req.Name
 	}
-	if req.LocationID != "" && req.LocationID != existing.LocationID {
+	if req.LocationID > 0 && req.LocationID != existing.LocationID {
 		if _, ok := allowed[req.LocationID]; !ok {
 			return nil, ErrForbidden
 		}
@@ -128,7 +126,7 @@ func (s *DeviceService) Update(ctx context.Context, userID, role, id string, req
 	return s.devices.FindByID(ctx, existing.ID)
 }
 
-func (s *DeviceService) Delete(ctx context.Context, userID, role, id string) error {
+func (s *DeviceService) Delete(ctx context.Context, userID, role string, id int64) error {
 	_, allowed, err := s.allowedLocations(ctx, userID, role)
 	if err != nil {
 		return err

@@ -11,6 +11,7 @@ require (
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/prometheus/client_golang v1.20.5
 	github.com/swaggo/echo-swagger v1.4.1
+	github.com/swaggo/swag v1.16.4
 	golang.org/x/crypto v0.28.0
 )
 
@@ -44,7 +45,6 @@ require (
 	github.com/prometheus/common v0.55.0 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
 	github.com/swaggo/files/v2 v2.0.0 // indirect
-	github.com/swaggo/swag v1.16.4 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	golang.org/x/net v0.26.0 // indirect

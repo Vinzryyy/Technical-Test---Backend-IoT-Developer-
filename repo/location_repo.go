@@ -34,7 +34,7 @@ func (r *LocationRepository) List(ctx context.Context) ([]models.Location, error
 	return out, rows.Err()
 }
 
-func (r *LocationRepository) Exists(ctx context.Context, id string) (bool, error) {
+func (r *LocationRepository) Exists(ctx context.Context, id int64) (bool, error) {
 	var exists bool
 	err := r.db.QueryRow(ctx,
 		`SELECT EXISTS(SELECT 1 FROM locations WHERE id = $1)`, id).Scan(&exists)

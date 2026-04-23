@@ -54,7 +54,7 @@ func (r *UserRepository) FindByID(ctx context.Context, id string) (*models.User,
 	return &u, nil
 }
 
-func (r *UserRepository) Create(ctx context.Context, u *models.User, locationIDs []string) error {
+func (r *UserRepository) Create(ctx context.Context, u *models.User, locationIDs []int64) error {
 	tx, err := r.db.Begin(ctx)
 	if err != nil {
 		return err
@@ -86,7 +86,7 @@ func (r *UserRepository) Create(ctx context.Context, u *models.User, locationIDs
 
 // LocationIDs returns every location the user is allowed to access.
 // Admins implicitly access every location, so this returns every location.
-func (r *UserRepository) LocationIDs(ctx context.Context, userID, role string) ([]string, error) {
+func (r *UserRepository) LocationIDs(ctx context.Context, userID, role string) ([]int64, error) {
 	var rows pgx.Rows
 	var err error
 	if role == "admin" {
@@ -100,9 +100,9 @@ func (r *UserRepository) LocationIDs(ctx context.Context, userID, role string) (
 	}
 	defer rows.Close()
 
-	out := make([]string, 0)
+	out := make([]int64, 0)
 	for rows.Next() {
-		var id string
+		var id int64
 		if err := rows.Scan(&id); err != nil {
 			return nil, err
 		}

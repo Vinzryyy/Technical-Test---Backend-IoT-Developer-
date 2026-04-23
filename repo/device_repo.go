@@ -22,7 +22,7 @@ func NewDeviceRepository(db *pgxpool.Pool) *DeviceRepository {
 
 // List returns all devices whose location is in allowedLocationIDs.
 // An empty slice means the caller has no access -> return empty list.
-func (r *DeviceRepository) List(ctx context.Context, allowedLocationIDs []string) ([]models.Device, error) {
+func (r *DeviceRepository) List(ctx context.Context, allowedLocationIDs []int64) ([]models.Device, error) {
 	if len(allowedLocationIDs) == 0 {
 		return []models.Device{}, nil
 	}
@@ -59,7 +59,7 @@ func (r *DeviceRepository) List(ctx context.Context, allowedLocationIDs []string
 	return out, rows.Err()
 }
 
-func (r *DeviceRepository) FindByID(ctx context.Context, id string) (*models.Device, error) {
+func (r *DeviceRepository) FindByID(ctx context.Context, id int64) (*models.Device, error) {
 	const q = `
 		SELECT d.id, d.name, d.location_id, l.name, d.status, d.updated_at, d.created_at
 		FROM devices d
@@ -78,15 +78,17 @@ func (r *DeviceRepository) FindByID(ctx context.Context, id string) (*models.Dev
 	return &d, nil
 }
 
+// Create inserts a new device. The DB auto-assigns the id (BIGSERIAL) and
+// writes it back into d.ID.
 func (r *DeviceRepository) Create(ctx context.Context, d *models.Device) error {
 	d.CreatedAt = time.Now()
 	d.UpdatedAt = d.CreatedAt
 	const q = `
-		INSERT INTO devices (id, name, location_id, status, updated_at, created_at)
-		VALUES ($1, $2, $3, $4, $5, $6)`
-	_, err := r.db.Exec(ctx, q,
-		d.ID, d.Name, d.LocationID, d.Status, d.UpdatedAt, d.CreatedAt)
-	return err
+		INSERT INTO devices (name, location_id, status, updated_at, created_at)
+		VALUES ($1, $2, $3, $4, $5)
+		RETURNING id`
+	return r.db.QueryRow(ctx, q,
+		d.Name, d.LocationID, d.Status, d.UpdatedAt, d.CreatedAt).Scan(&d.ID)
 }
 
 func (r *DeviceRepository) Update(ctx context.Context, d *models.Device) error {
@@ -105,7 +107,7 @@ func (r *DeviceRepository) Update(ctx context.Context, d *models.Device) error {
 	return nil
 }
 
-func (r *DeviceRepository) Delete(ctx context.Context, id string) error {
+func (r *DeviceRepository) Delete(ctx context.Context, id int64) error {
 	ct, err := r.db.Exec(ctx, `DELETE FROM devices WHERE id = $1`, id)
 	if err != nil {
 		return err

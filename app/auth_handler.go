@@ -47,13 +47,12 @@ func (h *AuthHandler) Login(c echo.Context) error {
 }
 
 // Register godoc
-// @Summary      Register user (admin only)
-// @Description  Create a new user with optional location access. Requires admin role.
+// @Summary      Self-register a new account (public)
+// @Description  Create a regular user account. Role is always "user" and no location access is granted — an admin must assign locations before the account can see devices.
 // @Tags         auth
 // @Accept       json
 // @Produce      json
 // @Param        request body models.RegisterRequest true "new user"
-// @Security     BearerAuth
 // @Success      201 {object} models.APIResponse{data=models.User}
 // @Failure      400 {object} models.APIResponse
 // @Failure      409 {object} models.APIResponse
@@ -73,6 +72,39 @@ func (h *AuthHandler) Register(c echo.Context) error {
 	return c.JSON(http.StatusCreated, models.APIResponse{
 		Success: true,
 		Message: "user created",
+		Data:    u,
+	})
+}
+
+// RegisterStaff godoc
+// @Summary      Register a staff user (admin only)
+// @Description  Admin-only endpoint to create a user with an explicit role and location access list.
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        request body models.StaffRegisterRequest true "new staff user"
+// @Security     BearerAuth
+// @Success      201 {object} models.APIResponse{data=models.User}
+// @Failure      400 {object} models.APIResponse
+// @Failure      401 {object} models.APIResponse
+// @Failure      403 {object} models.APIResponse
+// @Failure      409 {object} models.APIResponse
+// @Router       /auth/staff [post]
+func (h *AuthHandler) RegisterStaff(c echo.Context) error {
+	var req models.StaffRegisterRequest
+	if err := c.Bind(&req); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body")
+	}
+	if err := c.Validate(&req); err != nil {
+		return err
+	}
+	u, err := h.auth.RegisterStaff(c.Request().Context(), req)
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusCreated, models.APIResponse{
+		Success: true,
+		Message: "staff user created",
 		Data:    u,
 	})
 }

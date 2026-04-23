@@ -62,14 +62,30 @@ func (s *AuthService) Login(ctx context.Context, req models.LoginRequest) (*mode
 	}, nil
 }
 
+// Register is public self-signup. It forces role=user and grants no
+// locations — an admin must provision access afterwards.
 func (s *AuthService) Register(ctx context.Context, req models.RegisterRequest) (*models.User, error) {
-	if existing, err := s.users.FindByEmail(ctx, req.Email); err == nil && existing != nil {
+	return s.createUser(ctx, req.Name, req.Email, req.Password, "user", nil)
+}
+
+// RegisterStaff is admin-only: creates a user with an explicit role and
+// location access list.
+func (s *AuthService) RegisterStaff(ctx context.Context, req models.StaffRegisterRequest) (*models.User, error) {
+	role := req.Role
+	if role == "" {
+		role = "user"
+	}
+	return s.createUser(ctx, req.Name, req.Email, req.Password, role, req.LocationIDs)
+}
+
+func (s *AuthService) createUser(ctx context.Context, name, email, password, role string, locationIDs []string) (*models.User, error) {
+	if existing, err := s.users.FindByEmail(ctx, email); err == nil && existing != nil {
 		return nil, ErrEmailExists
 	} else if err != nil && !errors.Is(err, repo.ErrNotFound) {
 		return nil, err
 	}
 
-	for _, lid := range req.LocationIDs {
+	for _, lid := range locationIDs {
 		ok, err := s.locs.Exists(ctx, lid)
 		if err != nil {
 			return nil, err
@@ -79,24 +95,19 @@ func (s *AuthService) Register(ctx context.Context, req models.RegisterRequest) 
 		}
 	}
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, err
 	}
 
-	role := req.Role
-	if role == "" {
-		role = "user"
-	}
-
 	u := &models.User{
 		ID:       uuid.NewString(),
-		Name:     req.Name,
-		Email:    req.Email,
+		Name:     name,
+		Email:    email,
 		Password: string(hash),
 		Role:     role,
 	}
-	if err := s.users.Create(ctx, u, req.LocationIDs); err != nil {
+	if err := s.users.Create(ctx, u, locationIDs); err != nil {
 		return nil, err
 	}
 	u.Password = ""

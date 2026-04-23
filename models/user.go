@@ -34,7 +34,18 @@ type LoginResponse struct {
 	User        UserProfile `json:"user"`
 }
 
+// RegisterRequest is used for public self-registration. Role is always
+// forced to "user" and no location access is granted — an admin must
+// provision locations afterwards.
 type RegisterRequest struct {
+	Name     string `json:"name"     validate:"required,min=2,max=100"`
+	Email    string `json:"email"    validate:"required,email"`
+	Password string `json:"password" validate:"required,min=6"`
+}
+
+// StaffRegisterRequest is used by admins to create new staff with an
+// explicit role and location access list.
+type StaffRegisterRequest struct {
 	Name        string   `json:"name"         validate:"required,min=2,max=100"`
 	Email       string   `json:"email"        validate:"required,email"`
 	Password    string   `json:"password"     validate:"required,min=6"`

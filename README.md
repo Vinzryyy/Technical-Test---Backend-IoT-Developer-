@@ -78,19 +78,20 @@ Then open `http://localhost:8080/swagger/index.html`.
 
 ## Endpoints (summary)
 
-| Method | Path                    | Auth | Description                     |
-|--------|-------------------------|------|---------------------------------|
-| POST   | /api/v1/auth/login      | -    | Login, returns JWT              |
-| POST   | /api/v1/auth/register   | admin| Create a user (admin only)      |
-| GET    | /api/v1/me              | yes  | Current user profile            |
-| GET    | /api/v1/user            | yes  | Alias for `/me`                 |
-| GET    | /api/v1/devices         | yes  | List devices (location-scoped)  |
-| GET    | /api/v1/devices/:id     | yes  | Device details                  |
-| POST   | /api/v1/devices         | yes  | Create device                   |
-| PUT    | /api/v1/devices/:id     | yes  | Update device                   |
-| DELETE | /api/v1/devices/:id     | yes  | Delete device                   |
-| GET    | /health                 | -    | Liveness                        |
-| GET    | /metrics                | -    | Prometheus metrics              |
+| Method | Path                    | Auth  | Description                                                                         |
+|--------|-------------------------|-------|-------------------------------------------------------------------------------------|
+| POST   | /api/v1/auth/login      | -     | Login, returns JWT                                                                  |
+| POST   | /api/v1/auth/register   | -     | Public self-signup. Role forced to `user`, no locations until an admin grants them. |
+| POST   | /api/v1/auth/staff      | admin | Admin-only: create a staff user with explicit role + location access                |
+| GET    | /api/v1/me              | yes   | Current user profile                                                                |
+| GET    | /api/v1/user            | yes   | Alias for `/me`                                                                     |
+| GET    | /api/v1/devices         | yes   | List devices (location-scoped)                                                      |
+| GET    | /api/v1/devices/:id     | yes   | Device details                                                                      |
+| POST   | /api/v1/devices         | yes   | Create device                                                                       |
+| PUT    | /api/v1/devices/:id     | yes   | Update device                                                                       |
+| DELETE | /api/v1/devices/:id     | yes   | Delete device                                                                       |
+| GET    | /health                 | -     | Liveness                                                                            |
+| GET    | /metrics                | -     | Prometheus metrics                                                                  |
 
 ## Example curl
 

@@ -45,6 +45,7 @@ func NewRouter(d Deps) *echo.Echo {
 	// Public
 	auth := e.Group("/api/v1/auth")
 	auth.POST("/login", d.AuthHandler.Login)
+	auth.POST("/register", d.AuthHandler.Register)
 
 	// Protected
 	api := e.Group("/api/v1")
@@ -53,8 +54,8 @@ func NewRouter(d Deps) *echo.Echo {
 	api.GET("/me", d.AuthHandler.Me)
 	api.GET("/user", d.AuthHandler.Me) // alias
 
-	// Admin-only registration
-	api.POST("/auth/register", d.AuthHandler.Register, RequireRole("admin"))
+	// Admin-only: create staff with role + location access
+	api.POST("/auth/staff", d.AuthHandler.RegisterStaff, RequireRole("admin"))
 
 	// Devices
 	dev := api.Group("/devices")

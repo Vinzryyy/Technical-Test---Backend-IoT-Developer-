@@ -315,7 +315,7 @@
                 "summary": "Get device by ID",
                 "parameters": [
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "Device ID",
                         "name": "id",
                         "in": "path",
@@ -373,7 +373,7 @@
                 "summary": "Update device",
                 "parameters": [
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "Device ID",
                         "name": "id",
                         "in": "path",
@@ -422,7 +422,7 @@
                 "summary": "Delete device",
                 "parameters": [
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "Device ID",
                         "name": "id",
                         "in": "path",
@@ -506,7 +506,7 @@
             ],
             "properties": {
                 "location_id": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "name": {
                     "type": "string",
@@ -529,13 +529,13 @@
                     "type": "string"
                 },
                 "id": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "location": {
                     "type": "string"
                 },
                 "location_id": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "name": {
                     "type": "string"
@@ -555,7 +555,7 @@
                     "type": "string"
                 },
                 "id": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "name": {
                     "type": "string"
@@ -631,7 +631,7 @@
                 "location_ids": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "type": "integer"
                     }
                 },
                 "name": {
@@ -656,7 +656,7 @@
             "type": "object",
             "properties": {
                 "location_id": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "name": {
                     "type": "string",

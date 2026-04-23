@@ -13,7 +13,7 @@ definitions:
   models.CreateDeviceRequest:
     properties:
       location_id:
-        type: string
+        type: integer
       name:
         maxLength: 150
         minLength: 1
@@ -32,11 +32,11 @@ definitions:
       created_at:
         type: string
       id:
-        type: string
+        type: integer
       location:
         type: string
       location_id:
-        type: string
+        type: integer
       name:
         type: string
       status:
@@ -49,7 +49,7 @@ definitions:
       created_at:
         type: string
       id:
-        type: string
+        type: integer
       name:
         type: string
     type: object
@@ -97,7 +97,7 @@ definitions:
         type: string
       location_ids:
         items:
-          type: string
+          type: integer
         type: array
       name:
         maxLength: 100
@@ -119,7 +119,7 @@ definitions:
   models.UpdateDeviceRequest:
     properties:
       location_id:
-        type: string
+        type: integer
       name:
         maxLength: 150
         minLength: 1
@@ -350,7 +350,7 @@ paths:
         in: path
         name: id
         required: true
-        type: string
+        type: integer
       responses:
         "200":
           description: OK
@@ -367,7 +367,7 @@ paths:
         in: path
         name: id
         required: true
-        type: string
+        type: integer
       produces:
       - application/json
       responses:
@@ -401,7 +401,7 @@ paths:
         in: path
         name: id
         required: true
-        type: string
+        type: integer
       - description: device
         in: body
         name: request

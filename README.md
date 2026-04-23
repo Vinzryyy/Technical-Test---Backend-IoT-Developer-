@@ -57,6 +57,19 @@ The application will:
 2. execute `database/schema.sql` (idempotent — safe to re-run),
 3. seed two default users the first time it runs.
 
+## Optional: load extra sample data
+
+A larger demo dataset (2 more locations, ~20 extra devices, 2 extra staff
+users) lives in `database/sample_data.sql`. Run it manually in the Supabase
+SQL editor or with `psql` after the core schema has been applied — it is
+idempotent and additive:
+
+```bash
+psql "$DATABASE_URL" -f database/sample_data.sql
+```
+
+Adds logins `yogya@example.com` and `medan@example.com` (password `user123`).
+
 ## Default credentials (seeded automatically)
 
 | Role  | Email                    | Password  | Locations           |
@@ -112,7 +125,7 @@ curl -s http://localhost:8080/api/v1/devices -H "Authorization: Bearer $TOKEN"
 curl -s -X POST http://localhost:8080/api/v1/devices \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"name":"Sensor X","location_id":"11111111-1111-1111-1111-111111111111","status":"online"}'
+  -d '{"name":"Sensor X","location_id":1,"status":"online"}'
 ```
 
 ## Location isolation

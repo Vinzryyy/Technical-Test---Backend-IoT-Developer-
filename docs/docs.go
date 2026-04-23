@@ -322,7 +322,7 @@ const docTemplate = `{
                 "summary": "Get device by ID",
                 "parameters": [
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "Device ID",
                         "name": "id",
                         "in": "path",
@@ -380,7 +380,7 @@ const docTemplate = `{
                 "summary": "Update device",
                 "parameters": [
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "Device ID",
                         "name": "id",
                         "in": "path",
@@ -429,7 +429,7 @@ const docTemplate = `{
                 "summary": "Delete device",
                 "parameters": [
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "Device ID",
                         "name": "id",
                         "in": "path",
@@ -513,7 +513,7 @@ const docTemplate = `{
             ],
             "properties": {
                 "location_id": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "name": {
                     "type": "string",
@@ -536,13 +536,13 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "location": {
                     "type": "string"
                 },
                 "location_id": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "name": {
                     "type": "string"
@@ -562,7 +562,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "name": {
                     "type": "string"
@@ -638,7 +638,7 @@ const docTemplate = `{
                 "location_ids": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "type": "integer"
                     }
                 },
                 "name": {
@@ -663,7 +663,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "location_id": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "name": {
                     "type": "string",

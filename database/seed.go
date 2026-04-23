@@ -8,46 +8,101 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// SeedUsers inserts default admin + a Jakarta-scoped staff user on first run.
+const (
+	adminID      = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+	jakartaUID   = "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"
+	surabayaUID  = "cccccccc-cccc-cccc-cccc-cccccccccccc"
+	bandungUID   = "dddddddd-dddd-dddd-dddd-dddddddddddd"
+	supervisorID = "eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"
+
+	jakartaLocID  = "11111111-1111-1111-1111-111111111111"
+	surabayaLocID = "22222222-2222-2222-2222-222222222222"
+	bandungLocID  = "33333333-3333-3333-3333-333333333333"
+)
+
+type seedUser struct {
+	id       string
+	name     string
+	email    string
+	password string
+	role     string
+	// locations the user can access (ignored for admin)
+	locations []string
+}
+
+// SeedUsers inserts the default demo users on first run. Idempotent.
 func SeedUsers(pool *pgxpool.Pool) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
-	adminHash, err := bcrypt.GenerateFromPassword([]byte("admin123"), bcrypt.DefaultCost)
-	if err != nil {
-		return err
-	}
-	userHash, err := bcrypt.GenerateFromPassword([]byte("user123"), bcrypt.DefaultCost)
-	if err != nil {
-		return err
+	users := []seedUser{
+		{
+			id:       adminID,
+			name:     "Super Admin",
+			email:    "admin@example.com",
+			password: "admin123",
+			role:     "admin",
+		},
+		{
+			id:        jakartaUID,
+			name:      "Jakarta Staff",
+			email:     "jakarta@example.com",
+			password:  "user123",
+			role:      "user",
+			locations: []string{jakartaLocID},
+		},
+		{
+			id:        surabayaUID,
+			name:      "Surabaya Staff",
+			email:     "surabaya@example.com",
+			password:  "user123",
+			role:      "user",
+			locations: []string{surabayaLocID},
+		},
+		{
+			id:        bandungUID,
+			name:      "Bandung Staff",
+			email:     "bandung@example.com",
+			password:  "user123",
+			role:      "user",
+			locations: []string{bandungLocID},
+		},
+		{
+			id:        supervisorID,
+			name:      "Regional Supervisor",
+			email:     "supervisor@example.com",
+			password:  "super123",
+			role:      "user",
+			locations: []string{jakartaLocID, surabayaLocID},
+		},
 	}
 
-	const adminID = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
-	const userID = "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"
-	const jakartaID = "11111111-1111-1111-1111-111111111111"
+	for _, u := range users {
+		hash, err := bcrypt.GenerateFromPassword([]byte(u.password), bcrypt.DefaultCost)
+		if err != nil {
+			return err
+		}
 
-	_, err = pool.Exec(ctx, `
-		INSERT INTO users (id, name, email, password, role)
-		VALUES ($1, 'Super Admin', 'admin@example.com', $2, 'admin')
-		ON CONFLICT (email) DO NOTHING`,
-		adminID, string(adminHash))
-	if err != nil {
-		return err
+		_, err = pool.Exec(ctx, `
+			INSERT INTO users (id, name, email, password, role)
+			VALUES ($1, $2, $3, $4, $5)
+			ON CONFLICT (email) DO NOTHING`,
+			u.id, u.name, u.email, string(hash), u.role)
+		if err != nil {
+			return err
+		}
+
+		for _, loc := range u.locations {
+			_, err = pool.Exec(ctx, `
+				INSERT INTO user_locations (user_id, location_id)
+				VALUES ($1, $2)
+				ON CONFLICT DO NOTHING`,
+				u.id, loc)
+			if err != nil {
+				return err
+			}
+		}
 	}
 
-	_, err = pool.Exec(ctx, `
-		INSERT INTO users (id, name, email, password, role)
-		VALUES ($1, 'Jakarta Staff', 'jakarta@example.com', $2, 'user')
-		ON CONFLICT (email) DO NOTHING`,
-		userID, string(userHash))
-	if err != nil {
-		return err
-	}
-
-	_, err = pool.Exec(ctx, `
-		INSERT INTO user_locations (user_id, location_id)
-		VALUES ($1, $2)
-		ON CONFLICT DO NOTHING`,
-		userID, jakartaID)
-	return err
+	return nil
 }

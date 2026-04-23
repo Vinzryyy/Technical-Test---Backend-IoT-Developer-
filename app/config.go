@@ -18,7 +18,7 @@ type Config struct {
 func LoadConfig() Config {
 	expHours, _ := strconv.Atoi(getEnv("JWT_EXPIRES_HOURS", "24"))
 	return Config{
-		AppPort: getEnv("APP_PORT", "8080"),
+		AppPort: getEnv("PORT", getEnv("APP_PORT", "8080")),
 		AppEnv:  getEnv("APP_ENV", "development"),
 		DB: database.Config{
 			Host:     getEnv("DB_HOST", "localhost"),

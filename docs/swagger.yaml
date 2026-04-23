@@ -79,6 +79,22 @@ definitions:
     properties:
       email:
         type: string
+      name:
+        maxLength: 100
+        minLength: 2
+        type: string
+      password:
+        minLength: 6
+        type: string
+    required:
+    - email
+    - name
+    - password
+    type: object
+  models.StaffRegisterRequest:
+    properties:
+      email:
+        type: string
       location_ids:
         items:
           type: string
@@ -191,8 +207,9 @@ paths:
     post:
       consumes:
       - application/json
-      description: Create a new user with optional location access. Requires admin
-        role.
+      description: Create a regular user account. Role is always "user" and no location
+        access is granted — an admin must assign locations before the account can
+        see devices.
       parameters:
       - description: new user
         in: body
@@ -220,9 +237,53 @@ paths:
           description: Conflict
           schema:
             $ref: '#/definitions/models.APIResponse'
+      summary: Self-register a new account (public)
+      tags:
+      - auth
+  /auth/staff:
+    post:
+      consumes:
+      - application/json
+      description: Admin-only endpoint to create a user with an explicit role and
+        location access list.
+      parameters:
+      - description: new staff user
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.StaffRegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.User'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/models.APIResponse'
       security:
       - BearerAuth: []
-      summary: Register user (admin only)
+      summary: Register a staff user (admin only)
       tags:
       - auth
   /devices:
